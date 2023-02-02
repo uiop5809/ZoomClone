@@ -1,19 +1,32 @@
 const socket = io(); // io는 자동으로 서버 socket.io와 연결
 
+/* SocketIO */
 const welcome = document.getElementById("welcome");
 const form = welcome.querySelector("form");
+const room = document.getElementById("room");
+
+room.hidden = true;
+
+let roomName = "";
+
+function showRoom() {
+  welcome.hidden = true;
+  room.hidden = false;
+  const h3 = room.querySelector("h3");
+  h3.innerText = `Room ${roomName}`;
+}
 
 function handleSubmit(event) {
   event.preventDefault();
   const input = form.querySelector("input");
-  socket.emit("enter_room", { payload: input.value }, () => {
-    console.log("server is done!");
-  });
+  socket.emit("enter_room", input.value, showRoom);
+  roomName = input.value;
   input.value = "";
 }
 
 form.addEventListener("submit", handleSubmit);
 
+/* WebSocket */
 // // 프론트에서 socket은 서버 연결을 뜻
 // const socket = new WebSocket(`ws://${window.location.host}`);
 // const messageList = document.querySelector("ul");

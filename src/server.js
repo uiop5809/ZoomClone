@@ -4,6 +4,7 @@ import http from "http";
 import { Server } from "socket.io";
 // import { WebSocketServer } from "ws";
 
+/* SocketIO */
 const __dirname = path.resolve();
 const app = express();
 
@@ -20,13 +21,15 @@ const httpserver = http.createServer(app); // http 서버 생성
 const wsServer = new Server(httpserver); // http 서버 위에 SocketIO 서버 생성
 
 wsServer.on("connection", (socket) => {
-  socket.on("enter_room", (msg, done) => {
-    console.log(msg);
-    setTimeout(() => {
-      done();
-    }, 1000 * 10);
+  socket.on("enter_room", (roomName, done) => {
+    socket.join(roomName);
+    done();
   });
 });
+
+httpserver.listen(3000, handleListen);
+
+/* WebSocket */
 
 // const wss = new WebSocketServer({ server }); // http 서버 위에 WebSocket 서버 생성
 
@@ -51,13 +54,11 @@ wsServer.on("connection", (socket) => {
 //   });
 // });
 
-httpserver.listen(3000, handleListen);
-
-{
-  type: "message";
-  payload: "hello everyone!";
-}
-{
-  type: "nickname";
-  payload: "nico";
-}
+// {
+//   type: "message";
+//   payload: "hello everyone!";
+// }
+// {
+//   type: "nickname";
+//   payload: "nico";
+// }
