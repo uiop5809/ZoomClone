@@ -18,18 +18,34 @@ const handleListen = () => console.log(`Listening on http://localhost:3000`);
 const server = http.createServer(app); // http 서버 생성
 const wss = new WebSocketServer({ server }); // http 서버 위에 WebSocket 서버 생성
 
-// 유저가 접속할 때마다 socket 생성
+// 브라우저마다 socket 생성
 const sockets = [];
 
 // 백에서 socket은 브라우저 연결을 뜻
 wss.on("connection", (socket) => {
   sockets.push(socket);
-  socket.send("hello");
+  socket["nickname"] = "익명";
   socket.on("close", () => console.log("Disconnected from Browser"));
-  socket.on("message", (message) => {
-    sockets.forEach((aSocket) => aSocket.send(message.toString()));
+  socket.on("message", (msg) => {
+    const message = JSON.parse(msg);
+    switch (message.type) {
+      case "new_message":
+        sockets.forEach((aSocket) =>
+          aSocket.send(`${socket.nickname}: ${message.payload.toString()}`)
+        );
+      case "nickname":
+        socket["nickname"] = message.payload;
+    }
   });
-  console.log("Connected to Browser!");
 });
 
 server.listen(3000, handleListen);
+
+{
+  type: "message";
+  payload: "hello everyone!";
+}
+{
+  type: "nickname";
+  payload: "nico";
+}
