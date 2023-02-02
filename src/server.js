@@ -21,17 +21,25 @@ const httpserver = http.createServer(app); // http 서버 생성
 const wsServer = new Server(httpserver); // http 서버 위에 SocketIO 서버 생성
 
 wsServer.on("connection", (socket) => {
+  wsServer.socketsJoin("announcement");
+  socket["nickname"] = "익명";
   socket.on("enter_room", (roomName, done) => {
     socket.join(roomName);
     done();
-    socket.to(roomName).emit("welcome");
+    socket.to(roomName).emit("welcome", socket.nickname);
   });
   socket.on("disconnecting", () => {
-    socket.rooms.forEach((room) => socket.to(room).emit("bye"));
+    socket.rooms.forEach(
+      (room) => socket.to(room).emit("bye", socket.nickname),
+      socket.nickname
+    );
   });
   socket.on("new_message", (msg, room, done) => {
-    socket.to(room).emit("new_message", msg);
+    socket.to(room).emit("new_message", `${socket.nickname}: ${msg}`);
     done();
+  });
+  socket.on("nickname", (nickname) => {
+    socket["nickname"] = nickname;
   });
 });
 
