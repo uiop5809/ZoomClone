@@ -1,7 +1,8 @@
 import express from "express";
 import path from "path";
 import http from "http";
-import { WebSocketServer } from "ws";
+import { Server } from "socket.io";
+// import { WebSocketServer } from "ws";
 
 const __dirname = path.resolve();
 const app = express();
@@ -15,31 +16,37 @@ app.get("/*", (req, res) => res.redirect("/"));
 
 const handleListen = () => console.log(`Listening on http://localhost:3000`);
 
-const server = http.createServer(app); // http 서버 생성
-const wss = new WebSocketServer({ server }); // http 서버 위에 WebSocket 서버 생성
+const httpserver = http.createServer(app); // http 서버 생성
+const wsServer = new Server(httpserver); // http 서버 위에 SocketIO 서버 생성
 
-// 브라우저마다 socket 생성
-const sockets = [];
-
-// 백에서 socket은 브라우저 연결을 뜻
-wss.on("connection", (socket) => {
-  sockets.push(socket);
-  socket["nickname"] = "익명";
-  socket.on("close", () => console.log("Disconnected from Browser"));
-  socket.on("message", (msg) => {
-    const message = JSON.parse(msg);
-    switch (message.type) {
-      case "new_message":
-        sockets.forEach((aSocket) =>
-          aSocket.send(`${socket.nickname}: ${message.payload.toString()}`)
-        );
-      case "nickname":
-        socket["nickname"] = message.payload;
-    }
-  });
+wsServer.on("connection", (socket) => {
+  console.log(socket);
 });
 
-server.listen(3000, handleListen);
+// const wss = new WebSocketServer({ server }); // http 서버 위에 WebSocket 서버 생성
+
+// // 브라우저마다 socket 생성
+// const sockets = [];
+
+// // 백에서 socket은 브라우저 연결을 뜻
+// wss.on("connection", (socket) => {
+//   sockets.push(socket);
+//   socket["nickname"] = "익명";
+//   socket.on("close", () => console.log("Disconnected from Browser"));
+//   socket.on("message", (msg) => {
+//     const message = JSON.parse(msg);
+//     switch (message.type) {
+//       case "new_message":
+//         sockets.forEach((aSocket) =>
+//           aSocket.send(`${socket.nickname}: ${message.payload.toString()}`)
+//         );
+//       case "nickname":
+//         socket["nickname"] = message.payload;
+//     }
+//   });
+// });
+
+httpserver.listen(3000, handleListen);
 
 {
   type: "message";
