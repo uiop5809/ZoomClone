@@ -9,6 +9,13 @@ room.hidden = true;
 
 let roomName = "";
 
+function addMessage(message) {
+  const ul = room.querySelector("ul");
+  const li = document.createElement("li");
+  li.innerText = message;
+  ul.appendChild(li);
+}
+
 function showRoom() {
   welcome.hidden = true;
   room.hidden = false;
@@ -25,6 +32,11 @@ function handleSubmit(event) {
 }
 
 form.addEventListener("submit", handleSubmit);
+
+// 유저가 들어온다면
+socket.on("welcome", () => {
+  addMessage("someone joined!");
+});
 
 /* WebSocket */
 // // 프론트에서 socket은 서버 연결을 뜻
