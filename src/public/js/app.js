@@ -1,5 +1,19 @@
 const socket = io(); // io는 자동으로 서버 socket.io와 연결
 
+const welcome = document.getElementById("welcome");
+const form = welcome.querySelector("form");
+
+function handleSubmit(event) {
+  event.preventDefault();
+  const input = form.querySelector("input");
+  socket.emit("enter_room", { payload: input.value }, () => {
+    console.log("server is done!");
+  });
+  input.value = "";
+}
+
+form.addEventListener("submit", handleSubmit);
+
 // // 프론트에서 socket은 서버 연결을 뜻
 // const socket = new WebSocket(`ws://${window.location.host}`);
 // const messageList = document.querySelector("ul");

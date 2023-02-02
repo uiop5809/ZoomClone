@@ -20,7 +20,12 @@ const httpserver = http.createServer(app); // http 서버 생성
 const wsServer = new Server(httpserver); // http 서버 위에 SocketIO 서버 생성
 
 wsServer.on("connection", (socket) => {
-  console.log(socket);
+  socket.on("enter_room", (msg, done) => {
+    console.log(msg);
+    setTimeout(() => {
+      done();
+    }, 1000 * 10);
+  });
 });
 
 // const wss = new WebSocketServer({ server }); // http 서버 위에 WebSocket 서버 생성
