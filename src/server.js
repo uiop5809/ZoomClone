@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import http from "http";
-import WebSocket, { WebSocketServer } from "ws";
+import { WebSocketServer } from "ws";
 
 const __dirname = path.resolve();
 const app = express();
@@ -17,8 +17,13 @@ const handleListen = () => console.log(`Listening on http://localhost:3000`);
 
 // http 서버 생성
 const server = http.createServer(app);
-
 // http 서버 위에 WebSocket 서버 생성
 const wss = new WebSocketServer({ server });
+
+// 여기서 socket은 연결된 브라우저 뜻
+function handleConnection(socket) {
+  console.log(socket);
+}
+wss.on("connection", handleConnection);
 
 server.listen(3000, handleListen);
