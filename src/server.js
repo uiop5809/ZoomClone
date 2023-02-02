@@ -18,12 +18,16 @@ const handleListen = () => console.log(`Listening on http://localhost:3000`);
 const server = http.createServer(app); // http 서버 생성
 const wss = new WebSocketServer({ server }); // http 서버 위에 WebSocket 서버 생성
 
+// 유저가 접속할 때마다 socket 생성
+const sockets = [];
+
 // 백에서 socket은 브라우저 연결을 뜻
 wss.on("connection", (socket) => {
+  sockets.push(socket);
   socket.send("hello");
   socket.on("close", () => console.log("Disconnected from Browser"));
   socket.on("message", (message) => {
-    console.log(message.toString());
+    sockets.forEach((aSocket) => aSocket.send(message.toString()));
   });
   console.log("Connected to Browser!");
 });
